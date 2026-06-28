@@ -57,7 +57,6 @@ const Signup = () => {
 
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-          {/* Error */}
           {error && (
             <div className="mb-6 bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl font-semibold text-sm">
               ❌ {error}
@@ -67,12 +66,16 @@ const Signup = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label
+                htmlFor="signup-name"
+                className="block text-sm font-bold text-gray-700 mb-2"
+              >
                 Full Name
               </label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  id="signup-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -86,12 +89,16 @@ const Signup = () => {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label
+                htmlFor="signup-email"
+                className="block text-sm font-bold text-gray-700 mb-2"
+              >
                 Email Address
               </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  id="signup-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -104,12 +111,16 @@ const Signup = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label
+                htmlFor="signup-password"
+                className="block text-sm font-bold text-gray-700 mb-2"
+              >
                 Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  id="signup-password"
                   type={showPass ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -134,12 +145,16 @@ const Signup = () => {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label
+                htmlFor="signup-confirm"
+                className="block text-sm font-bold text-gray-700 mb-2"
+              >
                 Confirm Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  id="signup-confirm"
                   type={showPass ? "text" : "password"}
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}

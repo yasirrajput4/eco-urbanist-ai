@@ -283,6 +283,7 @@ const Upload = () => {
                   style={{ display: "none" }}
                   accept="image/png,image/jpeg,image/jpg"
                   onChange={handleFileChange}
+                  aria-label="Upload urban landscape image"
                 />
 
                 <button

@@ -19,7 +19,6 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // After login go back to the page they were trying to visit
   const from = location.state?.from?.pathname || "/upload";
 
   const handleSubmit = async (e) => {
@@ -53,7 +52,6 @@ const Login = () => {
 
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-          {/* Error message */}
           {error && (
             <div className="mb-6 bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl font-semibold text-sm">
               ❌ {error}
@@ -63,12 +61,16 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label
+                htmlFor="login-email"
+                className="block text-sm font-bold text-gray-700 mb-2"
+              >
                 Email Address
               </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  id="login-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -81,12 +83,16 @@ const Login = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label
+                htmlFor="login-password"
+                className="block text-sm font-bold text-gray-700 mb-2"
+              >
                 Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  id="login-password"
                   type={showPass ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
