@@ -4,10 +4,11 @@
 
 /**
  * Format file size to human-readable format
+ * Note: Kept local as it is only used by validateImageFile in this module
  * @param {number} bytes - File size in bytes
  * @returns {string} Formatted size (e.g., "2.5 MB")
  */
-export const formatFileSize = (bytes) => {
+const formatFileSize = (bytes) => {
   if (bytes === 0) return "0 Bytes";
 
   const k = 1024;
@@ -22,7 +23,7 @@ export const formatFileSize = (bytes) => {
  * @param {number} timestamp - Unix timestamp
  * @returns {string} Formatted date
  */
-export const formatDate = (timestamp) => {
+const formatDate = (timestamp) => {
   const date = new Date(timestamp * 1000);
   return date.toLocaleDateString("en-US", {
     year: "numeric",
@@ -68,7 +69,7 @@ export const validateImageFile = (file) => {
  * @param {number} score - Green score percentage
  * @returns {string} Tailwind color class
  */
-export const getGreenScoreColor = (score) => {
+const getGreenScoreColor = (score) => {
   if (score >= 70) return "text-green-600";
   if (score >= 40) return "text-yellow-600";
   return "text-red-600";
@@ -102,11 +103,12 @@ export const fileToDataUrl = (file) => {
 
 /**
  * Debounce function for performance optimization
+ * Note: Kept local as it is currently unused across other modules
  * @param {Function} func - Function to debounce
  * @param {number} wait - Wait time in milliseconds
  * @returns {Function} Debounced function
  */
-export const debounce = (func, wait) => {
+const debounce = (func, wait) => {
   let timeout;
   return function executedFunction(...args) {
     const later = () => {
@@ -124,7 +126,7 @@ export const debounce = (func, wait) => {
  * @param {number} after - Score after
  * @returns {number} Improvement percentage
  */
-export const calculateImprovement = (before, after) => {
+const calculateImprovement = (before, after) => {
   if (before === 0) return after > 0 ? 100 : 0;
   return Math.round(((after - before) / before) * 100);
 };
