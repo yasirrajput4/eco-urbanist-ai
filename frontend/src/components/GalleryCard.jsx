@@ -138,6 +138,7 @@ const GalleryCard = ({ item, onDelete }) => {
         {/* Action Buttons */}
         <div className="grid grid-cols-3 gap-2">
           <button
+            type="button"
             onClick={handleView}
             className="flex items-center justify-center gap-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-2 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-lg transform hover:scale-105"
           >
@@ -146,6 +147,7 @@ const GalleryCard = ({ item, onDelete }) => {
           </button>
 
           <button
+            type="button"
             onClick={handleDownload}
             className="flex items-center justify-center gap-1 bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-lg transform hover:scale-105"
           >
@@ -154,6 +156,7 @@ const GalleryCard = ({ item, onDelete }) => {
           </button>
 
           <button
+            type="button"
             onClick={handleDelete}
             className="flex items-center justify-center gap-1 bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-lg transform hover:scale-105"
           >

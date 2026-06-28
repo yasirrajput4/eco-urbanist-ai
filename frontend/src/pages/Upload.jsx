@@ -157,10 +157,6 @@ const Upload = () => {
 
       if (result.success) {
         // 🔧 FIX: isGeneratingRef was never reset on the success path.
-        // If the user navigates back to /upload (e.g. browser back button)
-        // and selects/generates again, the top guard
-        // `if (isGeneratingRef.current) return;` would silently block
-        // every future generation attempt.
         isGeneratingRef.current = false;
 
         setTimeout(() => {
@@ -256,7 +252,7 @@ const Upload = () => {
         {/* Upload Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-10 mb-10 border border-gray-100">
           {!file ? (
-            // Upload Zone - 🔧 ADDED "upload-zone" CLASS
+            // Upload Zone
             <div
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -317,6 +313,7 @@ const Upload = () => {
                   </h3>
                 </div>
                 <button
+                  type="button"
                   onClick={handleRemoveFile}
                   className="p-3 hover:bg-red-50 rounded-xl transition-all duration-300 group"
                   disabled={isProcessing}
@@ -361,7 +358,7 @@ const Upload = () => {
             </div>
           )}
 
-          {/* Progress Bar - ENHANCED */}
+          {/* Progress Bar */}
           {isProcessing && (
             <div className="mt-8 bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-200">
               <div className="flex items-center justify-between mb-3">
@@ -378,7 +375,6 @@ const Upload = () => {
                   className="bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 h-full transition-all duration-300 ease-out shadow-lg relative overflow-hidden"
                   style={{ width: `${progress}%` }}
                 >
-                  {/* Animated shimmer effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
                 </div>
               </div>
@@ -398,9 +394,10 @@ const Upload = () => {
             </div>
           )}
 
-          {/* Generate Button - 🔧 ADDED "generate-button" CLASS */}
+          {/* Generate Button */}
           {file && !isProcessing && (
             <button
+              type="button"
               onClick={handleGenerate}
               disabled={isProcessing}
               className="generate-button w-full mt-8 group inline-flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-5 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 font-black text-xl shadow-2xl hover:shadow-green-500/50 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
