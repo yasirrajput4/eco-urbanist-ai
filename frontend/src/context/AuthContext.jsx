@@ -6,7 +6,14 @@
  * Wrap App with <AuthProvider> so every component can call useAuth().
  */
 
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import api from "../services/api";
 
 const AuthContext = createContext(null);
@@ -24,29 +31,38 @@ export const AuthProvider = ({ children }) => {
     setAuthLoading(false);
   }, []);
 
-  const signup = async (name, email, password) => {
+  const signup = useCallback(async (name, email, password) => {
     const result = await api.signup(name, email, password);
     if (result.success) setCurrentUser(result.data.user);
     return result;
-  };
+  }, []);
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     const result = await api.login(email, password);
     if (result.success) setCurrentUser(result.data.user);
     return result;
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     api.logout();
     setCurrentUser(null);
-  };
+  }, []);
+
+  // Memoize the context value object.
+  // It will only change structural references if currentUser or authLoading changes.
+  const contextValue = useMemo(
+    () => ({
+      currentUser,
+      authLoading,
+      signup,
+      login,
+      logout,
+    }),
+    [currentUser, authLoading, signup, login, logout],
+  );
 
   return (
-    <AuthContext.Provider
-      value={{ currentUser, authLoading, signup, login, logout }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
