@@ -6,22 +6,30 @@ import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import Results from "./pages/Results";
 import Gallery from "./pages/Gallery";
-import Login from "./pages/Login"; // ADDED
-import Signup from "./pages/Signup"; // ADDED
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import OnboardingTour from "./components/OnboardingTour";
 import InstallPWA from "./components/InstallPWA";
 import ScrollToTop from "./components/ScrollToTop";
-import ProtectedRoute from "./components/ProtectedRoute"; // ADDED
-import { AuthProvider } from "./context/AuthContext"; // ADDED
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   const [runTour, setRunTour] = useState(false);
 
   useEffect(() => {
     const hasSeenTour = localStorage.getItem("onboarding-tour-completed");
+
+    let timerId; // Timer ID save karne ke liye variable
+
     if (!hasSeenTour) {
-      setTimeout(() => setRunTour(true), 1000);
+      timerId = setTimeout(() => setRunTour(true), 1000);
     }
+
+    // FIXED: Cleanup function jo memory leak hone se rokega
+    return () => {
+      if (timerId) clearTimeout(timerId);
+    };
   }, []);
 
   const handleTourFinish = () => {
@@ -30,13 +38,9 @@ function App() {
   };
 
   return (
-    // ADDED: AuthProvider wraps everything — makes useAuth() available
-    // in Navbar (logout, user name) and ProtectedRoute (login guard)
     <AuthProvider>
       <Router>
         <div className="flex flex-col min-h-screen relative">
-          {/* CHANGED: was an inline 8-prop style object. Now uses
-              .leaves-overlay CSS class (add to index.css as above). */}
           <div className="leaves-overlay">
             {/* LEFT SIDE LEAVES */}
             <div
@@ -216,9 +220,10 @@ function App() {
             <Routes>
               {/* Public routes — no login needed */}
               <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} /> {/* ADDED */}
-              <Route path="/signup" element={<Signup />} /> {/* ADDED */}
-              {/* ADDED: Protected routes — redirect to /login if not logged in */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+
+              {/* Protected routes — login guard */}
               <Route
                 path="/upload"
                 element={
