@@ -21,6 +21,24 @@ const API_BASE_URL =
       ? window.location.origin
       : "");
 
+// 🔮 FIXED: Versioned storage keys to prevent future data-shape migration crashes
+const TOKEN_KEY = "eco_token:v1";
+const USER_KEY = "eco_user:v1";
+
+// In-memory cache variables initialized with versioned storage fallback
+let tokenCache =
+  typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
+let userCache = null;
+
+try {
+  if (typeof window !== "undefined") {
+    const cachedUser = localStorage.getItem(USER_KEY);
+    userCache = cachedUser ? JSON.parse(cachedUser) : null;
+  }
+} catch {
+  userCache = null;
+}
+
 // Create axios instance
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -28,23 +46,23 @@ const apiClient = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// ADDED: Attach JWT token to every request automatically
-// Token is stored in localStorage after login/signup
+// Reads token seamlessly from cache memory
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("eco_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (tokenCache) {
+    config.headers.Authorization = `Bearer ${tokenCache}`;
   }
   return config;
 });
 
-// ADDED: If token is expired/invalid, clear it and redirect to login
+// Clears cache immediately along with versioned localStorage on 401
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("eco_token");
-      localStorage.removeItem("eco_user");
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      tokenCache = null;
+      userCache = null;
       // Only redirect if not already on auth pages
       if (!window.location.pathname.includes("/login")) {
         window.location.href = "/login";
@@ -60,7 +78,6 @@ apiClient.interceptors.response.use(
 const api = {
   // ── AUTH ────────────────────────────────────────────────────
 
-  // ADDED: Signup
   signup: async (name, email, password) => {
     try {
       const response = await apiClient.post("/api/auth/signup", {
@@ -68,9 +85,13 @@ const api = {
         email,
         password,
       });
-      // Save token + user to localStorage
-      localStorage.setItem("eco_token", response.data.token);
-      localStorage.setItem("eco_user", JSON.stringify(response.data.user));
+
+      // Update cache alongside versioned storage
+      tokenCache = response.data.token;
+      userCache = response.data.user;
+
+      localStorage.setItem(TOKEN_KEY, tokenCache);
+      localStorage.setItem(USER_KEY, JSON.stringify(userCache));
       return { success: true, data: response.data };
     } catch (error) {
       return {
@@ -80,15 +101,19 @@ const api = {
     }
   },
 
-  // ADDED: Login
   login: async (email, password) => {
     try {
       const response = await apiClient.post("/api/auth/login", {
         email,
         password,
       });
-      localStorage.setItem("eco_token", response.data.token);
-      localStorage.setItem("eco_user", JSON.stringify(response.data.user));
+
+      // Update cache alongside versioned storage
+      tokenCache = response.data.token;
+      userCache = response.data.user;
+
+      localStorage.setItem(TOKEN_KEY, tokenCache);
+      localStorage.setItem(USER_KEY, JSON.stringify(userCache));
       return { success: true, data: response.data };
     } catch (error) {
       return {
@@ -98,13 +123,13 @@ const api = {
     }
   },
 
-  // ADDED: Logout
   logout: () => {
-    localStorage.removeItem("eco_token");
-    localStorage.removeItem("eco_user");
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    tokenCache = null;
+    userCache = null;
   },
 
-  // ADDED: Get current logged-in user
   getMe: async () => {
     try {
       const response = await apiClient.get("/api/auth/me");
@@ -117,46 +142,26 @@ const api = {
     }
   },
 
-  // ADDED: Check if user is logged in (reads from localStorage)
-  getCurrentUser: () => {
-    try {
-      const user = localStorage.getItem("eco_user");
-      return user ? JSON.parse(user) : null;
-    } catch {
-      return null;
-    }
-  },
+  // No disk access or JSON parsing on consecutive calls
+  getCurrentUser: () => userCache,
 
-  isLoggedIn: () => !!localStorage.getItem("eco_token"),
+  // O(1) instantaneous operational speed lookup
+  isLoggedIn: () => !!tokenCache,
 
   // ── PREDICTION ──────────────────────────────────────────────
 
-  /**
-   * CHANGED: was posting directly to FastAPI /api/predict
-   * Now posts to Express /api/predict which:
-   *   - checks JWT auth
-   *   - checks daily limit
-   *   - forwards to FastAPI
-   *   - saves result to MongoDB gallery
-   *   - returns same response shape as before + galleryId
-   *
-   * ADDED: inputImagePreview param — small base64 thumbnail of input
-   * image sent as a form field so Express can save it to MongoDB
-   * (replaces the full base64 that was causing localStorage overflow)
-   */
   generatePrediction: async (imageFile, inputImagePreview = null) => {
     try {
       const formData = new FormData();
       formData.append("file", imageFile);
 
-      // Send preview thumbnail if provided (keep it small — resize before sending)
       if (inputImagePreview) {
         formData.append("inputImagePreview", inputImagePreview);
       }
 
       const response = await apiClient.post("/api/predict", formData, {
         headers: { "Content-Type": "multipart/form-data" },
-        timeout: 300000, // 5 min for AI inference
+        timeout: 300000,
       });
 
       return { success: true, data: response.data };
@@ -167,7 +172,6 @@ const api = {
         errorMessage =
           "Request timeout. The server is taking too long to respond.";
       } else if (error.response?.status === 429) {
-        // Daily limit or IP rate limit
         errorMessage = error.response.data?.error || "Rate limit exceeded.";
       } else if (error.response) {
         errorMessage = error.response?.data?.error || error.response.statusText;
@@ -182,8 +186,6 @@ const api = {
   },
 
   // ── GALLERY ─────────────────────────────────────────────────
-  // CHANGED: these now hit Express /api/gallery (MongoDB)
-  // instead of reading/writing to localStorage via storage.js
 
   getGallery: async (sort = "newest") => {
     try {
@@ -234,8 +236,6 @@ const api = {
   },
 
   // ── DOWNLOAD ────────────────────────────────────────────────
-  // CHANGED: download now goes through Express proxy so React
-  // doesn't need to know FastAPI's URL
 
   getDownloadUrl: (filename) => {
     return `${API_BASE_URL}/api/predict/download/${filename}`;
