@@ -1,0 +1,265 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom global styles */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #1f2937;
+  background-color: #f9fafb;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #ffffff;
+  color: #1f2937;
+  /* 🍃 LEAF CURSOR */
+  cursor:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%2322c55e" stroke="%23166534" stroke-width="1"><path d="M20.998 3v2c0 9.627-5.373 14-12 14-1.381 0-2.63-.56-3.5-1.5 2.5 1.5 6.5 2 9.5-1 3-3 3.5-7.5 3.5-10.5h-3c0 3-1 7-4 10-3 3-7.5 2.5-10.5 0C2.5 14.5 3 12 3 9.5 3 6.186 5.686 3.5 9 3.5c1.933 0 3.683.785 4.95 2.05L15.5 4c.828-.828 2.172-.828 3 0s.828 2.172 0 3l-1.55 1.55C18.215 7.183 19 5.433 19 3.5c0-.166-.008-.331-.024-.494L20.998 3z"/></svg>'),
+    auto;
+}
+
+/* 🍃 Leaf cursor for clickable elements */
+a,
+button,
+input[type="submit"],
+input[type="button"],
+.cursor-pointer {
+  cursor:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="%2316a34a" stroke="%23166534" stroke-width="1.5"><path d="M20.998 3v2c0 9.627-5.373 14-12 14-1.381 0-2.63-.56-3.5-1.5 2.5 1.5 6.5 2 9.5-1 3-3 3.5-7.5 3.5-10.5h-3c0 3-1 7-4 10-3 3-7.5 2.5-10.5 0C2.5 14.5 3 12 3 9.5 3 6.186 5.686 3.5 9 3.5c1.933 0 3.683.785 4.95 2.05L15.5 4c.828-.828 2.172-.828 3 0s.828 2.172 0 3l-1.55 1.55C18.215 7.183 19 5.433 19 3.5c0-.166-.008-.331-.024-.494L20.998 3z"/></svg>'),
+    pointer;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #22c55e;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #16a34a;
+}
+
+/* Smooth transitions */
+* {
+  box-sizing: border-box;
+}
+
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* 🍃 FLOATING LEAVES ANIMATION - OPTIMIZED */
+@keyframes floatLeaf {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(120vh) translateX(100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes floatLeafReverse {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(120vh) translateX(-80px) rotate(-360deg);
+    opacity: 0;
+  }
+}
+
+.floating-leaf {
+  position: absolute;
+  font-size: 2rem;
+  pointer-events: none;
+  z-index: 1;
+  animation: floatLeaf 15s infinite linear;
+  top: -10%;
+}
+
+.floating-leaf:nth-child(even) {
+  animation: floatLeafReverse 18s infinite linear;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.2);
+}
+
+/* Green glow effect */
+.green-glow {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+}
+
+/* Custom utilities */
+.container-custom {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* File upload drag-and-drop styles */
+.file-upload-area {
+  border: 2px dashed #22c55e;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background-color: #f9fafb;
+}
+
+.file-upload-area:hover {
+  border-color: #16a34a;
+  background-color: rgba(34, 197, 94, 0.05);
+}
+
+.file-upload-area.drag-active {
+  border-color: #16a34a;
+  background-color: rgba(34, 197, 94, 0.1);
+  transform: scale(1.02);
+}
+
+/* Image comparison slider */
+.comparison-slider {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Result card animations */
+.result-card-enter {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1rem;
+  background: #1f2937;
+  color: white;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .container-custom {
+    padding: 0 0.5rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+/* Leaves overlay container */
+.leaves-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 999;
+}
