@@ -17,7 +17,10 @@ const Home = () => {
   const sectionRefs = useRef([]);
 
   useEffect(() => {
-    const observers = sectionRefs.current.map((ref, index) => {
+    // Current refs ko ek local variable me store kiya clean-up ke liye
+    const currentRefs = sectionRefs.current;
+
+    const observers = currentRefs.map((ref, index) => {
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
@@ -31,7 +34,14 @@ const Home = () => {
       return observer;
     });
 
-    return () => observers.forEach((observer) => observer.disconnect());
+    // Cleanup function ko correct structure me likha
+    return () => {
+      observers.forEach((observer, index) => {
+        if (currentRefs[index]) {
+          observer.disconnect();
+        }
+      });
+    };
   }, []);
 
   const addToRefs = (el) => {
@@ -45,13 +55,13 @@ const Home = () => {
       {/* Hero Section */}
       <Hero />
 
-      {/* Stats Bar - ANIMATED */}
+      {/* Stats Bar - ANIMATED (Bounces Removed) */}
       <section className="py-12 bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 animate-gradient-x">
         <div className="container-custom">
           <div className="grid md:grid-cols-3 gap-8 text-center text-white">
             <div className="transform hover:scale-125 transition-all duration-500 hover:rotate-3 cursor-pointer">
               <div className="flex items-center justify-center mb-2">
-                <TrendingUp className="w-8 h-8 mr-2 animate-bounce" />
+                <TrendingUp className="w-8 h-8 mr-2" />
                 <p className="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white to-yellow-200">
                   1000+
                 </p>
@@ -71,7 +81,7 @@ const Home = () => {
             </div>
             <div className="transform hover:scale-125 transition-all duration-500 hover:rotate-3 cursor-pointer">
               <div className="flex items-center justify-center mb-2">
-                <Lock className="w-8 h-8 mr-2 animate-bounce" />
+                <Lock className="w-8 h-8 mr-2" />
                 <p className="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white to-yellow-200">
                   100%
                 </p>
@@ -102,7 +112,7 @@ const Home = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Step 1 - CRAZY HOVER */}
+            {/* Step 1 */}
             <div
               ref={addToRefs}
               className={`text-center bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl transition-all duration-500 transform hover:scale-110 hover:bg-gradient-to-br hover:from-yellow-100 hover:to-orange-100 hover:shadow-2xl hover:rotate-2 cursor-pointer border-4 border-transparent hover:border-yellow-400 ${
@@ -123,7 +133,7 @@ const Home = () => {
               </p>
             </div>
 
-            {/* Step 2 - CRAZY HOVER */}
+            {/* Step 2 */}
             <div
               ref={addToRefs}
               className={`text-center bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl transition-all duration-500 transform hover:scale-110 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:shadow-2xl hover:-rotate-2 cursor-pointer border-4 border-transparent hover:border-blue-400 delay-100 ${
@@ -144,7 +154,7 @@ const Home = () => {
               </p>
             </div>
 
-            {/* Step 3 - CRAZY HOVER */}
+            {/* Step 3 */}
             <div
               ref={addToRefs}
               className={`text-center bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl transition-all duration-500 transform hover:scale-110 hover:bg-gradient-to-br hover:from-pink-100 hover:to-red-100 hover:shadow-2xl hover:rotate-2 cursor-pointer border-4 border-transparent hover:border-pink-400 delay-200 ${
@@ -188,7 +198,7 @@ const Home = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Feature 1 - EXPLOSIVE HOVER */}
+            {/* Feature 1 */}
             <div
               ref={addToRefs}
               className={`bg-white p-6 rounded-2xl shadow-lg border-4 border-transparent hover:border-yellow-400 hover:shadow-2xl transform hover:scale-110 hover:-rotate-3 transition-all duration-500 cursor-pointer hover:bg-gradient-to-br hover:from-yellow-50 hover:to-orange-50 ${
@@ -208,7 +218,7 @@ const Home = () => {
               </p>
             </div>
 
-            {/* Feature 2 - EXPLOSIVE HOVER */}
+            {/* Feature 2 */}
             <div
               ref={addToRefs}
               className={`bg-white p-6 rounded-2xl shadow-lg border-4 border-transparent hover:border-blue-400 hover:shadow-2xl transform hover:scale-110 hover:rotate-3 transition-all duration-500 cursor-pointer hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50 delay-100 ${
@@ -228,7 +238,7 @@ const Home = () => {
               </p>
             </div>
 
-            {/* Feature 3 - EXPLOSIVE HOVER */}
+            {/* Feature 3 */}
             <div
               ref={addToRefs}
               className={`bg-white p-6 rounded-2xl shadow-lg border-4 border-transparent hover:border-purple-400 hover:shadow-2xl transform hover:scale-110 hover:-rotate-3 transition-all duration-500 cursor-pointer hover:bg-gradient-to-br hover:from-purple-50 hover:to-pink-50 delay-200 ${
@@ -248,7 +258,7 @@ const Home = () => {
               </p>
             </div>
 
-            {/* Feature 4 - EXPLOSIVE HOVER */}
+            {/* Feature 4 */}
             <div
               ref={addToRefs}
               className={`bg-white p-6 rounded-2xl shadow-lg border-4 border-transparent hover:border-orange-400 hover:shadow-2xl transform hover:scale-110 hover:rotate-3 transition-all duration-500 cursor-pointer hover:bg-gradient-to-br hover:from-orange-50 hover:to-red-50 delay-300 ${
@@ -271,40 +281,40 @@ const Home = () => {
         </div>
       </section>
 
-      {/* CTA Section - MEGA BUTTON */}
+      {/* CTA Section - MEGA BUTTON (Fixed Bounces) */}
       <section className="py-24 bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 relative overflow-hidden">
-        {/* Crazy animated background */}
+        {/* Animated background shapes */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-96 h-96 bg-yellow-300 rounded-full blur-3xl opacity-20 animate-pulse"></div>
           <div
             className="absolute bottom-0 right-0 w-96 h-96 bg-blue-300 rounded-full blur-3xl opacity-20 animate-pulse"
             style={{ animationDelay: "1s" }}
           ></div>
-          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-300 rounded-full blur-3xl opacity-20 animate-bounce"></div>
+          <div
+            className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-300 rounded-full blur-3xl opacity-20 animate-pulse"
+            style={{ animationDuration: "6s" }}
+          ></div>
         </div>
 
         <div className="container-custom text-center relative z-10">
-          <h2 className="text-5xl md:text-6xl font-black text-white mb-6 animate-pulse">
+          <h2 className="text-5xl md:text-6xl font-black text-white mb-6">
             Ready to Green Your City? 🌳
           </h2>
           <p className="text-2xl text-green-100 mb-10 max-w-2xl mx-auto font-semibold">
             Start visualizing sustainable urban development today
           </p>
 
-          {/* MEGA CRAZY BUTTON */}
+          {/* MEGA CTA BUTTON */}
           <a
             href="/upload"
-            className="group inline-flex items-center gap-3 bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 text-gray-900 px-12 py-6 rounded-2xl font-black text-2xl shadow-2xl hover:shadow-yellow-400 transition-all duration-500 transform hover:scale-125 hover:rotate-3 border-8 border-white hover:border-yellow-200 animate-bounce hover:animate-none"
+            className="group inline-flex items-center gap-3 bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 text-gray-900 px-12 py-6 rounded-2xl font-black text-2xl shadow-2xl hover:shadow-yellow-400 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform hover:scale-110 hover:-translate-y-1 border-8 border-white hover:border-yellow-200"
           >
             <Sparkles className="w-8 h-8 animate-spin" />
             <span className="relative z-10">🚀 GET STARTED NOW</span>
-            <ArrowRight className="w-8 h-8 relative z-10 group-hover:translate-x-3 transition-transform duration-300 animate-pulse" />
+            <ArrowRight className="w-8 h-8 relative z-10 group-hover:translate-x-3 transition-transform duration-300" />
           </a>
 
-          <p
-            className="text-white mt-8 text-lg font-bold animate-bounce"
-            style={{ animationDelay: "0.5s" }}
-          >
+          <p className="text-white mt-8 text-lg font-bold opacity-90">
             ✨ No signup • Free forever • Start in 30 seconds ✨
           </p>
         </div>

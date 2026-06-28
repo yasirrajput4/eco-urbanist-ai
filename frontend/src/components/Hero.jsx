@@ -182,8 +182,8 @@ const Hero = () => {
               </div>
             </div>
 
-            {/* Floating Badge */}
-            <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-black shadow-2xl animate-bounce border-4 border-white text-xs sm:text-sm">
+            {/* Floating Badge - FIXED: Premium easing on hover instead of infinite bouncing */}
+            <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-black shadow-2xl border-4 border-white text-xs sm:text-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform hover:scale-110 hover:rotate-3">
               ✨ 100% FREE
             </div>
 
