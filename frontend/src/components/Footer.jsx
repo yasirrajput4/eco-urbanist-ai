@@ -470,7 +470,7 @@ const Footer = () => {
                   Anas Kazi & Team
                 </a>
               </p>
-              <span className="text-gray-500 text-xs bg-purple-500/10 border border-purple-500/30 px-3 py-1 rounded-full font-bold">
+              <span className="text-purple-300 text-xs bg-purple-500/10 border border-purple-500/30 px-3 py-1 rounded-full font-bold">
                 🎓 Academic Project
               </span>
             </div>
