@@ -19,14 +19,12 @@ function App() {
 
   useEffect(() => {
     const hasSeenTour = localStorage.getItem("onboarding-tour-completed");
-
-    let timerId; // Timer ID save karne ke liye variable
+    let timerId;
 
     if (!hasSeenTour) {
       timerId = setTimeout(() => setRunTour(true), 1000);
     }
 
-    // FIXED: Cleanup function jo memory leak hone se rokega
     return () => {
       if (timerId) clearTimeout(timerId);
     };
@@ -40,176 +38,52 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="flex flex-col min-h-screen relative">
-          <div className="leaves-overlay">
+        <div className="flex flex-col min-h-screen relative overflow-hidden">
+          {/* LEAVES OVERLAY (Ab saara inline style gayab) */}
+          <div className="leaves-overlay pointer-events-none">
             {/* LEFT SIDE LEAVES */}
-            <div
-              style={{
-                position: "absolute",
-                left: "2%",
-                top: "-10%",
-                fontSize: "2rem",
-                animation: "floatLeaf 15s infinite linear",
-                animationDelay: "0s",
-              }}
-            >
+            <div className="leaf-item left-[2%] top-[-10%] text-[2rem] animate-float-leaf">
               🍃
             </div>
-            <div
-              style={{
-                position: "absolute",
-                left: "8%",
-                top: "-10%",
-                fontSize: "1.5rem",
-                animation: "floatLeafReverse 18s infinite linear",
-                animationDelay: "3s",
-              }}
-            >
+            <div className="leaf-item left-[8%] top-[-10%] text-[1.5rem] animate-float-leaf-rev [animation-delay:3s]">
               🌿
             </div>
-            <div
-              style={{
-                position: "absolute",
-                left: "5%",
-                top: "-10%",
-                fontSize: "2rem",
-                animation: "floatLeaf 15s infinite linear",
-                animationDelay: "6s",
-              }}
-            >
+            <div className="leaf-item left-[5%] top-[-10%] text-[2rem] animate-float-leaf [animation-delay:6s]">
               🍀
             </div>
-            <div
-              style={{
-                position: "absolute",
-                left: "12%",
-                top: "-10%",
-                fontSize: "2.5rem",
-                animation: "floatLeafReverse 18s infinite linear",
-                animationDelay: "2s",
-              }}
-            >
+            <div className="leaf-item left-[12%] top-[-10%] text-[2.5rem] animate-float-leaf-rev [animation-delay:2s]">
               🌱
             </div>
-            <div
-              style={{
-                position: "absolute",
-                left: "3%",
-                top: "-10%",
-                fontSize: "2rem",
-                animation: "floatLeaf 15s infinite linear",
-                animationDelay: "8s",
-              }}
-            >
+            <div className="leaf-item left-[3%] top-[-10%] text-[2rem] animate-float-leaf [animation-delay:8s]">
               🌾
             </div>
-            <div
-              style={{
-                position: "absolute",
-                left: "10%",
-                top: "-10%",
-                fontSize: "1.8rem",
-                animation: "floatLeafReverse 18s infinite linear",
-                animationDelay: "5s",
-              }}
-            >
+            <div className="leaf-item left-[10%] top-[-10%] text-[1.8rem] animate-float-leaf-rev [animation-delay:5s]">
               🪴
             </div>
-            <div
-              style={{
-                position: "absolute",
-                left: "7%",
-                top: "-10%",
-                fontSize: "1.6rem",
-                animation: "floatLeaf 15s infinite linear",
-                animationDelay: "10s",
-              }}
-            >
+            <div className="leaf-item left-[7%] top-[-10%] text-[1.6rem] animate-float-leaf [animation-delay:10s]">
               🍃
             </div>
+
             {/* RIGHT SIDE LEAVES */}
-            <div
-              style={{
-                position: "absolute",
-                right: "2%",
-                top: "-10%",
-                fontSize: "2rem",
-                animation: "floatLeafReverse 18s infinite linear",
-                animationDelay: "1s",
-              }}
-            >
+            <div className="leaf-item right-[2%] top-[-10%] text-[2rem] animate-float-leaf-rev [animation-delay:1s]">
               🌿
             </div>
-            <div
-              style={{
-                position: "absolute",
-                right: "8%",
-                top: "-10%",
-                fontSize: "1.5rem",
-                animation: "floatLeaf 15s infinite linear",
-                animationDelay: "4s",
-              }}
-            >
+            <div className="leaf-item right-[8%] top-[-10%] text-[1.5rem] animate-float-leaf [animation-delay:4s]">
               🍀
             </div>
-            <div
-              style={{
-                position: "absolute",
-                right: "5%",
-                top: "-10%",
-                fontSize: "2.2rem",
-                animation: "floatLeafReverse 18s infinite linear",
-                animationDelay: "7s",
-              }}
-            >
+            <div className="leaf-item right-[5%] top-[-10%] text-[2.2rem] animate-float-leaf-rev [animation-delay:7s]">
               🌱
             </div>
-            <div
-              style={{
-                position: "absolute",
-                right: "12%",
-                top: "-10%",
-                fontSize: "2rem",
-                animation: "floatLeaf 15s infinite linear",
-                animationDelay: "2s",
-              }}
-            >
+            <div className="leaf-item right-[12%] top-[-10%] text-[2rem] animate-float-leaf [animation-delay:2s]">
               🌾
             </div>
-            <div
-              style={{
-                position: "absolute",
-                right: "3%",
-                top: "-10%",
-                fontSize: "1.8rem",
-                animation: "floatLeafReverse 18s infinite linear",
-                animationDelay: "9s",
-              }}
-            >
+            <div className="leaf-item right-[3%] top-[-10%] text-[1.8rem] animate-float-leaf-rev [animation-delay:9s]">
               🪴
             </div>
-            <div
-              style={{
-                position: "absolute",
-                right: "10%",
-                top: "-10%",
-                fontSize: "2.3rem",
-                animation: "floatLeaf 15s infinite linear",
-                animationDelay: "5s",
-              }}
-            >
+            <div className="leaf-item right-[10%] top-[-10%] text-[2.3rem] animate-float-leaf [animation-delay:5s]">
               🍃
             </div>
-            <div
-              style={{
-                position: "absolute",
-                right: "7%",
-                top: "-10%",
-                fontSize: "1.7rem",
-                animation: "floatLeafReverse 18s infinite linear",
-                animationDelay: "11s",
-              }}
-            >
+            <div className="leaf-item right-[7%] top-[-10%] text-[1.7rem] animate-float-leaf-rev [animation-delay:11s]">
               🌿
             </div>
           </div>
@@ -218,12 +92,9 @@ function App() {
           <main className="flex-grow relative z-10">
             <ScrollToTop />
             <Routes>
-              {/* Public routes — no login needed */}
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-
-              {/* Protected routes — login guard */}
               <Route
                 path="/upload"
                 element={

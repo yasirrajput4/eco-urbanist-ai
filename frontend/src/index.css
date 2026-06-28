@@ -263,3 +263,15 @@ button {
   overflow: hidden;
   z-index: 999;
 }
+/* 🍃 Leaf items ke liye custom animation utilities */
+.animate-float-leaf {
+  animation: floatLeaf 15s infinite linear;
+}
+
+.animate-float-leaf-rev {
+  animation: floatLeafReverse 18s infinite linear;
+}
+
+.leaf-item {
+  position: absolute;
+}
