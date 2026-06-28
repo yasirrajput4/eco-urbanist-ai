@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   Image as ImageIcon,
@@ -14,27 +14,17 @@ import { galleryStorage } from "../utils/storage";
 import GalleryCard from "../components/GalleryCard";
 
 const Gallery = () => {
-  const [gallery, setGallery] = useState([]);
+  // Use lazy state initializers to load from storage synchronously on initial render
+  const [gallery, setGallery] = useState(() => galleryStorage.getAll());
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
-  const [stats, setStats] = useState({
-    totalImages: 0,
-    averageImprovement: 0,
-    totalTreesPlanted: 0,
-  });
+  const [stats, setStats] = useState(() => galleryStorage.getStats());
 
-  // Load gallery on mount
-  useEffect(() => {
-    loadGallery();
-  }, []);
-
-  const loadGallery = () => {
-    const data = galleryStorage.getAll();
-    const galleryStats = galleryStorage.getStats();
-    setGallery(data);
-    setStats(galleryStats);
+  // Extracted logic to synchronise both states when underlying storage modifications happen
+  const refreshGalleryState = () => {
+    setGallery(galleryStorage.getAll());
+    setStats(galleryStorage.getStats());
   };
-
 
   const filteredGallery = useMemo(() => {
     let filtered = [...gallery];
@@ -69,10 +59,10 @@ const Gallery = () => {
 
     return filtered;
   }, [gallery, searchTerm, sortBy]);
-  
+
   const handleDelete = (id) => {
     const success = galleryStorage.delete(id);
-    if (success) loadGallery();
+    if (success) refreshGalleryState();
   };
 
   const handleClearAll = () => {
@@ -82,7 +72,7 @@ const Gallery = () => {
       )
     ) {
       const success = galleryStorage.clearAll();
-      if (success) loadGallery();
+      if (success) refreshGalleryState();
     }
   };
 
@@ -105,7 +95,7 @@ const Gallery = () => {
           </p>
         </div>
 
-        {/* Statistics Cards — restored exactly as original */}
+        {/* Statistics Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-10">
           <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-shadow">
             <div className="flex items-center justify-between mb-3">
@@ -134,7 +124,11 @@ const Gallery = () => {
               </span>
             </div>
             <p className="text-4xl font-black text-green-600 mb-1">
-              +{stats.averageImprovement.toFixed(1)}%
+              +
+              {stats.averageImprovement
+                ? stats.averageImprovement.toFixed(1)
+                : "0.0"}
+              %
             </p>
             <p className="text-sm text-gray-600 font-semibold">
               Green Improvement

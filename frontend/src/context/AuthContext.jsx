@@ -10,7 +10,6 @@ import {
   createContext,
   useContext,
   useState,
-  useEffect,
   useMemo,
   useCallback,
 } from "react";
@@ -19,17 +18,17 @@ import api from "../services/api";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [authLoading, setAuthLoading] = useState(true); // true until localStorage check done
-
-  // On mount: restore session from localStorage if token still exists
-  useEffect(() => {
+  // Use lazy state initialization to read from localStorage synchronously on first paint
+  const [currentUser, setCurrentUser] = useState(() => {
     const user = api.getCurrentUser();
     if (user && api.isLoggedIn()) {
-      setCurrentUser(user);
+      return user;
     }
-    setAuthLoading(false);
-  }, []);
+    return null;
+  });
+
+  // Since state is evaluated immediately on creation, we don't need a loading flash
+  const [authLoading] = useState(false);
 
   const signup = useCallback(async (name, email, password) => {
     const result = await api.signup(name, email, password);
@@ -49,7 +48,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Memoize the context value object.
-  // It will only change structural references if currentUser or authLoading changes.
   const contextValue = useMemo(
     () => ({
       currentUser,
