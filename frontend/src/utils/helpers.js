@@ -69,7 +69,7 @@ export const validateImageFile = (file) => {
  * @param {number} score - Green score percentage
  * @returns {string} Tailwind color class
  */
-const getGreenScoreColor = (score) => {
+export const getGreenScoreColor = (score) => {
   if (score >= 70) return "text-green-600";
   if (score >= 40) return "text-yellow-600";
   return "text-red-600";
