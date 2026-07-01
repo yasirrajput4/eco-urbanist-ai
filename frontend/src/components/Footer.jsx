@@ -224,7 +224,7 @@ const Footer = () => {
               <div className="flex items-center gap-3 flex-wrap">
                 {/* GitHub */}
                 <a
-                  href="https://github.com/anaskazi-dev-mind/Eco-Urbanist-AI"
+                  href="https://github.com/yasirrajput4/eco-urbanist-ai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center gap-2 bg-gray-800 px-5 py-3 rounded-xl hover:bg-gradient-to-r hover:from-gray-700 hover:to-gray-800 transition-all transform hover:scale-110 hover:-translate-y-1 shadow-xl hover:shadow-2xl border border-gray-700 hover:border-green-500"
@@ -236,7 +236,7 @@ const Footer = () => {
 
                 {/* LinkedIn */}
                 <a
-                  href="https://www.linkedin.com/in/anaskazi001"
+                  href="https://www.linkedin.com/in/YasirRajput"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-110 hover:-translate-y-1 shadow-xl hover:shadow-blue-500/50 border-2 border-blue-500"
@@ -249,7 +249,7 @@ const Footer = () => {
 
               {/* Star on GitHub CTA */}
               <a
-                href="https://github.com/anaskazi-dev-mind/Eco-Urbanist-AI"
+                href="https://github.com/yasirrajput4/eco-urbanist-ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-3 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-2 border-green-500/50 px-6 py-3 rounded-xl hover:bg-gradient-to-r hover:from-green-500/30 hover:to-emerald-500/30 hover:border-green-400 transition-all backdrop-blur-sm transform hover:scale-105"
@@ -269,14 +269,14 @@ const Footer = () => {
                   College Project Team
                 </p>
                 <a
-                  href="https://github.com/anaskazi-dev-mind"
+                  href="https://github.com/yasirrajput4"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-base font-black text-white hover:text-green-400 transition-colors flex items-center gap-2 mb-1"
-                  aria-label="Visit Anas Kazi's GitHub Profile"
+                  aria-label="Visit Yasir Rajput's GitHub Profile"
                 >
                   <Code2 className="w-4 h-4" />
-                  Anas Kazi & Team
+                  Yasir Rajput
                   <ExternalLink className="w-3 h-3" />
                 </a>
                 <p className="text-xs text-gray-400">
@@ -328,7 +328,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="https://github.com/anaskazi-dev-mind/Eco-Urbanist-AI"
+                  href="https://github.com/yasirrajput4/eco-urbanist-ai.git"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center hover:text-green-400 transition-all font-semibold text-gray-400"
@@ -343,7 +343,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="https://github.com/anaskazi-dev-mind/Eco-Urbanist-AI#readme"
+                  href="https://github.com/yasirrajput4/eco-urbanist-ai#readme"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center hover:text-green-400 transition-all font-semibold text-gray-400"
@@ -358,7 +358,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="https://github.com/anaskazi-dev-mind/Eco-Urbanist-AI/issues"
+                  href="https://github.com/yasirrajput4/eco-urbanist-ai/issues"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center hover:text-green-400 transition-all font-semibold text-gray-400"
@@ -461,13 +461,13 @@ const Footer = () => {
                 <Heart className="w-5 h-5 mx-2 text-red-500 fill-current animate-pulse" />{" "}
                 by{" "}
                 <a
-                  href="https://github.com/anaskazi-dev-mind"
+                  href="https://github.com/yasirrajput4"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ml-1 text-green-400 hover:text-green-300 font-bold transition-colors"
-                  aria-label="Visit Anas Kazi's GitHub"
+                  aria-label="Visit Yasir Rajput's GitHub"
                 >
-                  Anas Kazi & Team
+                  Yasir Rajput
                 </a>
               </p>
               <span className="text-purple-300 text-xs bg-purple-500/10 border border-purple-500/30 px-3 py-1 rounded-full font-bold">

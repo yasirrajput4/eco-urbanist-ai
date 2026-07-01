@@ -79,7 +79,7 @@ const Signup = () => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Anas Kazi"
+                  placeholder="Yasir Rajput"
                   required
                   maxLength={50}
                   className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none font-medium text-gray-800 transition-colors"
