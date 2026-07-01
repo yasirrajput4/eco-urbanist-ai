@@ -7,7 +7,7 @@ import {
   Linkedin,
   Code2,
   Rocket,
-  Users,
+  User,
   AlertTriangle,
   Wind,
   Droplets,
@@ -184,7 +184,7 @@ const Footer = () => {
             {/* Target Audience */}
             <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-2 border-indigo-500/30 rounded-2xl p-5 mb-6">
               <p className="text-sm font-black text-indigo-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Users className="w-4 h-4" />
+                <User className="w-4 h-4" />
                 Built For
               </p>
               <div className="grid grid-cols-2 gap-2 text-xs text-gray-300">
@@ -262,11 +262,11 @@ const Footer = () => {
                 <ExternalLink className="w-4 h-4 text-green-400 group-hover:translate-x-1 transition-transform" />
               </a>
 
-              {/* Team Badge */}
+              {/* Creator Badge */}
               <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-500/30 px-5 py-4 rounded-xl backdrop-blur-sm">
                 <p className="text-xs text-purple-400 font-semibold mb-2 flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  College Project Team
+                  <User className="w-4 h-4" />
+                  Personal Portfolio Project
                 </p>
                 <a
                   href="https://github.com/yasirrajput4"
@@ -280,7 +280,7 @@ const Footer = () => {
                   <ExternalLink className="w-3 h-3" />
                 </a>
                 <p className="text-xs text-gray-400">
-                  Built with passion by students 🎓
+                  Built with passion by an Independent Developer 💻
                 </p>
               </div>
             </div>
@@ -440,9 +440,9 @@ const Footer = () => {
             </div>
 
             <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl p-6 hover:bg-gray-800 transition-all transform hover:scale-110 hover:-translate-y-2 border-2 border-gray-700 hover:border-green-500 shadow-lg hover:shadow-green-500/30">
-              <div className="text-4xl text-center mb-2">🎓</div>
+              <div className="text-4xl text-center mb-2">🏙️</div>
               <p className="text-sm text-gray-400 font-bold text-center">
-                College Project
+                Smart Urban Planning
               </p>
             </div>
           </div>
@@ -471,7 +471,7 @@ const Footer = () => {
                 </a>
               </p>
               <span className="text-purple-300 text-xs bg-purple-500/10 border border-purple-500/30 px-3 py-1 rounded-full font-bold">
-                🎓 Academic Project
+                💻 Personal Project
               </span>
             </div>
           </div>
