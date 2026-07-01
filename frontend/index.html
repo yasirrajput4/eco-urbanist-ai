@@ -21,16 +21,21 @@
     />
     <meta name="apple-mobile-web-app-title" content="Eco-Urbanist AI" />
 
-    <!-- 🔧 FIX: vite-plugin-pwa generates "manifest.webmanifest" by default,
-         not "manifest.json". The original link pointed to a file that is
-         never produced by the build, so the browser 404s on it and PWA
-         install metadata/icons may fail to load correctly. -->
+    <!-- 🔧 FIX: vite-plugin-pwa generates "manifest.webmanifest" by default -->
     <link rel="manifest" href="/manifest.webmanifest" />
 
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="/icon-192x192.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.png" />
     <link rel="apple-touch-icon" sizes="512x512" href="/icon-512x512.png" />
+
+    <!-- 👇 NEW: Plus Jakarta Sans font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
     <title>Eco-Urbanist AI - Transform Cities with AI</title>
   </head>
