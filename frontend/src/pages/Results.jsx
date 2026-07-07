@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import {
   Download,
@@ -33,17 +33,36 @@ import {
 import api from "../services/api";
 import { getGreenScoreColor, getGreenScoreLabel } from "../utils/helpers";
 import ImageComparisonSlider from "../components/ImageComparisonSlider";
-import { galleryStorage } from "../utils/storage"; // 🔧 NEW
+import { galleryStorage } from "../utils/storage";
+
+// ---- Reducer: a single call site handles every update to this state ----
+const initialResultsState = {
+  resultData: null,
+  outputUrl: null,
+  inputPreview: null,
+  savedToGallery: false,
+};
+
+function resultsReducer(state, action) {
+  switch (action.type) {
+    case "SET_RESULTS":
+      return { ...state, ...action.payload };
+    default:
+      return state;
+  }
+}
 
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [inputPreview, setInputPreview] = useState(null);
-  const [outputUrl, setOutputUrl] = useState(null);
-  const [resultData, setResultData] = useState(null);
+  const [resultsState, dispatch] = useReducer(
+    resultsReducer,
+    initialResultsState,
+  );
+  const { resultData, outputUrl, inputPreview, savedToGallery } = resultsState;
+
   const [isDownloading, setIsDownloading] = useState(false);
-  const [savedToGallery, setSavedToGallery] = useState(false); // 🔧 NEW
 
   useEffect(() => {
     const { result, inputFile, fromGallery, galleryInputPreview } =
@@ -54,32 +73,70 @@ const Results = () => {
       return;
     }
 
-    setResultData(result);
+    const finalOutputUrl = result.output_filename
+      ? api.getDownloadUrl(result.output_filename)
+      : null;
 
-    if (result.output_filename) {
-      setOutputUrl(api.getDownloadUrl(result.output_filename));
-    }
+    let cancelled = false;
 
-    // 🔧 NEW: Handle input preview (from upload or gallery)
-    if (fromGallery && galleryInputPreview) {
-      // Viewing from gallery - use saved preview
-      setInputPreview(galleryInputPreview);
-      setSavedToGallery(true); // Already in gallery
-    } else if (inputFile) {
-      // Fresh generation - read file and save to gallery
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const preview = e.target.result;
-        setInputPreview(preview);
+    // Resolve the preview (sync for gallery items, async for freshly
+    // uploaded files) into a single promise so we only ever need ONE
+    // state update below, no matter which path we took.
+    const resolvePreview = () => {
+      if (fromGallery && galleryInputPreview) {
+        return Promise.resolve({
+          preview: galleryInputPreview,
+          shouldSaveToGallery: false,
+          saved: true,
+        });
+      }
 
-        // 🔧 NEW: Auto-save to gallery
+      if (inputFile) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            resolve({
+              preview: e.target.result,
+              shouldSaveToGallery: true,
+              saved: true,
+            });
+          };
+          reader.readAsDataURL(inputFile);
+        });
+      }
+
+      return Promise.resolve({
+        preview: null,
+        shouldSaveToGallery: false,
+        saved: false,
+      });
+    };
+
+    resolvePreview().then(({ preview, shouldSaveToGallery, saved }) => {
+      if (cancelled) return;
+
+      if (shouldSaveToGallery) {
         saveToGallery(result, preview);
-      };
-      reader.readAsDataURL(inputFile);
-    }
+      }
+
+      // Single dispatch for this effect run, regardless of which
+      // branch produced the data.
+      dispatch({
+        type: "SET_RESULTS",
+        payload: {
+          resultData: result,
+          outputUrl: finalOutputUrl,
+          inputPreview: preview,
+          savedToGallery: saved,
+        },
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [location, navigate]);
 
-  // 🔧 NEW: Save result to gallery
   const saveToGallery = (result, inputImagePreview) => {
     try {
       const galleryItem = {
@@ -89,9 +146,7 @@ const Results = () => {
         visualization: result.visualization,
         metadata: result.metadata,
       };
-
       galleryStorage.add(galleryItem);
-      setSavedToGallery(true);
       console.log("✅ Saved to gallery");
     } catch (error) {
       console.error("Failed to save to gallery:", error);
@@ -136,24 +191,16 @@ const Results = () => {
     (greenScores.output?.green_pixels || 0) -
     (greenScores.input?.green_pixels || 0);
 
-  // Calculate environmental impact metrics
-  const co2Absorbed = (treesPlaced * 21).toFixed(1); // kg per year per tree
-  const oxygenProduced = (treesPlaced * 118).toFixed(0); // kg per year per tree
+  const co2Absorbed = (treesPlaced * 21).toFixed(1);
+  const oxygenProduced = (treesPlaced * 118).toFixed(0);
   const airQualityImprovement = Math.min((improvement * 2.5).toFixed(1), 100);
-  const temperatureReduction = (improvement * 0.15).toFixed(1); // °C reduction estimate
+  const temperatureReduction = (improvement * 0.15).toFixed(1);
 
   const chartData = [
-    {
-      name: "Before",
-      "Green Coverage": parseFloat(inputScore.toFixed(2)),
-    },
-    {
-      name: "After",
-      "Green Coverage": parseFloat(outputScore.toFixed(2)),
-    },
+    { name: "Before", "Green Coverage": parseFloat(inputScore.toFixed(2)) },
+    { name: "After", "Green Coverage": parseFloat(outputScore.toFixed(2)) },
   ];
 
-  // Environmental Impact Radar Chart Data
   const radarData = [
     { metric: "Green Coverage", before: inputScore, after: outputScore },
     {
@@ -180,7 +227,6 @@ const Results = () => {
               Generate Another
             </Link>
 
-            {/* 🔧 NEW: Gallery saved indicator */}
             {savedToGallery && (
               <Link
                 to="/gallery"
@@ -233,16 +279,7 @@ const Results = () => {
           </div>
         </div>
 
-        {/* Image Comparison Slider
-            FIX: was {inputPreview && outputUrl && (...)} — inputPreview
-            comes from FileReader.onload which is async. On first render
-            inputPreview is null so the entire section (slider + download
-            button + all cards below) never appeared.
-            Now we show the section as soon as outputUrl is ready.
-            - If inputPreview hasn't loaded yet → show a skeleton
-              placeholder on the left side so the slider still appears.
-            - Once FileReader completes → inputPreview state updates and
-              the real before-image replaces the skeleton automatically. */}
+        {/* Image Comparison Slider */}
         {outputUrl && (
           <div className="bg-white rounded-3xl shadow-2xl p-10 mb-10">
             <h2 className="text-3xl font-black text-gray-900 mb-8 flex items-center justify-center">
@@ -251,7 +288,6 @@ const Results = () => {
             </h2>
 
             {inputPreview ? (
-              // Both images ready — show full comparison slider
               <ImageComparisonSlider
                 beforeImage={inputPreview}
                 afterImage={outputUrl}
@@ -259,8 +295,6 @@ const Results = () => {
                 afterLabel="AI Enhanced"
               />
             ) : (
-              // outputUrl ready but inputPreview still loading from FileReader
-              // Show a skeleton so the slider area isn't blank/missing
               <div className="relative w-full rounded-2xl overflow-hidden border-4 border-green-200 shadow-2xl">
                 <img
                   src={outputUrl}
@@ -300,9 +334,8 @@ const Results = () => {
           </div>
         )}
 
-        {/* Stats Cards - BIG NUMBERS */}
+        {/* Stats Cards */}
         <div className="grid md:grid-cols-3 gap-8 mb-10">
-          {/* Improvement Card */}
           <div className="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all transform hover:scale-105 border-4 border-green-200">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-gradient-to-br from-green-400 to-emerald-500 p-4 rounded-2xl shadow-lg">
@@ -325,7 +358,6 @@ const Results = () => {
             </p>
           </div>
 
-          {/* Green Pixels Card */}
           <div className="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all transform hover:scale-105 border-4 border-blue-200">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-gradient-to-br from-blue-400 to-blue-500 p-4 rounded-2xl shadow-lg">
@@ -346,7 +378,6 @@ const Results = () => {
             </p>
           </div>
 
-          {/* Trees Placed Card */}
           <div className="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all transform hover:scale-105 border-4 border-emerald-200">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-gradient-to-br from-emerald-400 to-emerald-500 p-4 rounded-2xl shadow-lg">
@@ -368,14 +399,13 @@ const Results = () => {
           </div>
         </div>
 
-        {/* 🔥 NEW FEATURE 1: Environmental Impact Cards */}
+        {/* Environmental Impact Cards */}
         <div className="mb-10">
           <h2 className="text-3xl font-black text-gray-900 mb-6 flex items-center">
             <Sparkles className="w-8 h-8 mr-3 text-green-600" />
             Environmental Impact Assessment
           </h2>
           <div className="grid md:grid-cols-4 gap-6">
-            {/* CO2 Absorption */}
             <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl shadow-xl p-6 text-white transform hover:scale-105 transition-all">
               <div className="flex items-center justify-between mb-3">
                 <Cloud className="w-10 h-10" />
@@ -392,7 +422,6 @@ const Results = () => {
               </p>
             </div>
 
-            {/* Oxygen Production */}
             <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-3xl shadow-xl p-6 text-white transform hover:scale-105 transition-all">
               <div className="flex items-center justify-between mb-3">
                 <Wind className="w-10 h-10" />
@@ -409,7 +438,6 @@ const Results = () => {
               </p>
             </div>
 
-            {/* Air Quality */}
             <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl shadow-xl p-6 text-white transform hover:scale-105 transition-all">
               <div className="flex items-center justify-between mb-3">
                 <Droplets className="w-10 h-10" />
@@ -426,7 +454,6 @@ const Results = () => {
               <p className="text-xs opacity-75">Reduces PM2.5 particles</p>
             </div>
 
-            {/* Temperature Reduction */}
             <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl shadow-xl p-6 text-white transform hover:scale-105 transition-all">
               <div className="flex items-center justify-between mb-3">
                 <Sun className="w-10 h-10" />
@@ -447,7 +474,6 @@ const Results = () => {
 
         {/* Charts Section */}
         <div className="grid lg:grid-cols-2 gap-8 mb-10">
-          {/* Bar Chart */}
           <div className="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-shadow">
             <h3 className="text-2xl font-black text-gray-900 mb-6 flex items-center">
               <BarChart3 className="w-6 h-6 mr-3 text-green-600" />
@@ -501,7 +527,6 @@ const Results = () => {
             </div>
           </div>
 
-          {/* 🔥 NEW FEATURE 2: Environmental Radar Chart */}
           <div className="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-shadow">
             <h3 className="text-2xl font-black text-gray-900 mb-6 flex items-center">
               <Sparkles className="w-6 h-6 mr-3 text-green-600" />
@@ -548,7 +573,7 @@ const Results = () => {
           </div>
         </div>
 
-        {/* 🔥 NEW FEATURE 3: Tree Distribution with Icons */}
+        {/* Tree Distribution Analysis */}
         <div className="bg-white rounded-3xl shadow-xl p-8 mb-10">
           <h3 className="text-2xl font-black text-gray-900 mb-6 flex items-center">
             <TreePine className="w-6 h-6 mr-3 text-green-600" />
@@ -586,7 +611,7 @@ const Results = () => {
           </div>
         </div>
 
-        {/* 🔥 NEW FEATURE 4: Sustainability Score Card */}
+        {/* Sustainability Score Card */}
         <div className="bg-gradient-to-br from-green-600 via-emerald-600 to-green-700 rounded-3xl shadow-2xl p-10 mb-10 text-white">
           <div className="text-center mb-8">
             <h2 className="text-4xl font-black mb-3">
@@ -598,7 +623,6 @@ const Results = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
-            {/* Overall Score */}
             <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center border-2 border-white/30">
               <p className="text-sm font-semibold mb-2 opacity-90">
                 Overall Score
@@ -609,7 +633,6 @@ const Results = () => {
               <p className="text-xs opacity-75">Out of 100</p>
             </div>
 
-            {/* Grade */}
             <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center border-2 border-white/30">
               <p className="text-sm font-semibold mb-2 opacity-90">
                 Sustainability Grade
@@ -628,7 +651,6 @@ const Results = () => {
               <p className="text-xs opacity-75">Excellent Rating</p>
             </div>
 
-            {/* Trees per Hectare (estimate) */}
             <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center border-2 border-white/30">
               <p className="text-sm font-semibold mb-2 opacity-90">
                 Tree Density
@@ -676,7 +698,6 @@ const Results = () => {
           </h3>
 
           <div className="space-y-6">
-            {/* Before */}
             <div>
               <div className="flex justify-between text-sm mb-3">
                 <span className="text-gray-700 font-bold">Original Image</span>
@@ -692,7 +713,6 @@ const Results = () => {
               </div>
             </div>
 
-            {/* After */}
             <div>
               <div className="flex justify-between text-sm mb-3">
                 <span className="text-gray-700 font-bold">
