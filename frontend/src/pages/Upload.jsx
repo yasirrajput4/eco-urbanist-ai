@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useReducer, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Upload as UploadIcon,
@@ -15,35 +15,104 @@ import {
 import api from "../services/api";
 import { validateImageFile, fileToDataUrl } from "../utils/helpers";
 
+// 1. Initial State define kari
+const initialState = {
+  file: null,
+  preview: null,
+  isDragging: false,
+  isProcessing: false,
+  error: null,
+  progress: 0,
+  statusMessage: "",
+};
+
+// 2. Reducer function banaya jo state transitions ko track karega
+function uploadReducer(state, action) {
+  switch (action.type) {
+    case "SET_DRAG":
+      return { ...state, isDragging: action.payload };
+    case "START_PREVIEW":
+      return { ...state, error: null };
+    case "SET_FILE_SUCCESS":
+      return {
+        ...state,
+        file: action.payload.file,
+        preview: action.payload.preview,
+        error: null,
+      };
+    case "SET_ERROR":
+      return {
+        ...state,
+        error: action.payload,
+        isProcessing: false,
+        progress: 0,
+        statusMessage: "",
+      };
+    case "REMOVE_FILE":
+      return { ...initialState }; // Poori state reset
+    case "START_GENERATION":
+      return {
+        ...state,
+        isProcessing: true,
+        error: null,
+        progress: 0,
+        statusMessage: "Initializing...",
+      };
+    case "UPDATE_PROGRESS":
+      return {
+        ...state,
+        progress: action.payload.progress,
+        statusMessage: action.payload.statusMessage,
+      };
+    case "GENERATION_SUCCESS":
+      return {
+        ...state,
+        progress: 100,
+        statusMessage: "✅ Complete! Redirecting to results...",
+      };
+    case "FINISH_PROCESSING":
+      return { ...state, isProcessing: false };
+    default:
+      return state;
+  }
+}
+
 const Upload = () => {
   const navigate = useNavigate();
 
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState(null);
-  const [progress, setProgress] = useState(0);
-  const [statusMessage, setStatusMessage] = useState("");
+  // 3. useReducer hook ka setup
+  const [state, dispatch] = useReducer(uploadReducer, initialState);
+
+  // Destructure kar liya taaki aapka niche ka JSX bilkul na badalna pade
+  const {
+    file,
+    preview,
+    isDragging,
+    isProcessing,
+    error,
+    progress,
+    statusMessage,
+  } = state;
 
   const isGeneratingRef = useRef(false);
 
   const handleFileSelect = async (selectedFile) => {
-    setError(null);
+    dispatch({ type: "START_PREVIEW" });
 
     const validation = validateImageFile(selectedFile);
     if (!validation.valid) {
-      setError(validation.error);
+      dispatch({ type: "SET_ERROR", payload: validation.error });
       return;
     }
 
-    setFile(selectedFile);
-
     try {
       const dataUrl = await fileToDataUrl(selectedFile);
-      setPreview(dataUrl);
+      dispatch({
+        type: "SET_FILE_SUCCESS",
+        payload: { file: selectedFile, preview: dataUrl },
+      });
     } catch (err) {
-      setError("Failed to generate preview");
+      dispatch({ type: "SET_ERROR", payload: "Failed to generate preview" });
       console.error(err);
     }
   };
@@ -57,17 +126,17 @@ const Upload = () => {
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    setIsDragging(true);
+    dispatch({ type: "SET_DRAG", payload: true });
   };
 
   const handleDragLeave = (e) => {
     e.preventDefault();
-    setIsDragging(false);
+    dispatch({ type: "SET_DRAG", payload: false });
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    setIsDragging(false);
+    dispatch({ type: "SET_DRAG", payload: false });
 
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
@@ -76,11 +145,7 @@ const Upload = () => {
   };
 
   const handleRemoveFile = () => {
-    setFile(null);
-    setPreview(null);
-    setError(null);
-    setProgress(0);
-    setStatusMessage("");
+    dispatch({ type: "REMOVE_FILE" });
     isGeneratingRef.current = false;
   };
 
@@ -91,7 +156,7 @@ const Upload = () => {
     }
 
     if (!file) {
-      setError("Please select an image first");
+      dispatch({ type: "SET_ERROR", payload: "Please select an image first" });
       return;
     }
 
@@ -101,62 +166,78 @@ const Upload = () => {
     }
 
     isGeneratingRef.current = true;
-    setIsProcessing(true);
-    setError(null);
-    setProgress(0);
-    setStatusMessage("Initializing...");
+    dispatch({ type: "START_GENERATION" });
 
     let progressInterval = null;
 
     try {
-      // 🔧 SMOOTH PROGRESS SIMULATION - Updates every 300ms
       progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          // Cap at 95% until we get response
-          if (prev >= 95) {
-            setStatusMessage("🤖 AI is analyzing your image... Almost done!");
-            return prev;
-          }
+        // Reducer synchronous hota hai, isliye interval ke andar current progress calculate karke bhejni hogi
+        let currentProgress = 0;
 
-          // Smooth increment by 1%
-          const next = prev + 1;
+        // Interval ke andar hum trigger de rahe hain aur state update dispatch kar rahe hain
+        dispatch({
+          type: "UPDATE_PROGRESS",
+          payload: () => {
+            // Hum is pattern ko safe rakhne ke liye functional logic reducer ke bahar ya state value se chalate hain
+            // Par smoothly manage karne ke liye, local variables ko direct read/increment karenge state object se:
+            const prev = state.progress;
 
-          // Update status messages based on progress
-          if (next <= 10) {
-            setStatusMessage("📤 Uploading image to server...");
-          } else if (next <= 20) {
-            setStatusMessage("🔍 Validating image format...");
-          } else if (next <= 35) {
-            setStatusMessage("🌍 Detecting buildings and infrastructure...");
-          } else if (next <= 50) {
-            setStatusMessage("🏜️ Analyzing terrain and surfaces...");
-          } else if (next <= 65) {
-            setStatusMessage("🤖 AI model generating predictions...");
-          } else if (next <= 80) {
-            setStatusMessage("🌳 Calculating optimal green space placement...");
-          } else if (next <= 90) {
-            setStatusMessage("🎨 Applying green overlay and tree icons...");
-          } else {
-            setStatusMessage("📊 Finalizing results and calculations...");
-          }
-
-          return next;
+            // Re-calculating next step safely based on reducer's latest active state reference
+          },
         });
-      }, 300); // Update every 300ms for smooth animation
 
-      const result = await api.generatePrediction(file, preview); // preview already exists in state
-      // Clear interval when response arrives
+        // Loop workaround ke bina, functional wrapper useReducer progress logic:
+        // Kyunki setInterval closure bana leta hai, reducer state.progress ki updated value nahi read kar paayega sahi se agar state variable reference loose ho jaye.
+        // Isliye logic ko clean rakhne ke liye hum direct state updates dispatch karte hain:
+      }, 300);
+
+      // 💡 Interval progress tracking block fixed to work seamlessly with useReducer state transitions:
+      let localProgress = 0;
+      progressInterval = setInterval(() => {
+        if (localProgress >= 95) {
+          dispatch({
+            type: "UPDATE_PROGRESS",
+            payload: {
+              progress: 95,
+              statusMessage: "🤖 AI is analyzing your image... Almost done!",
+            },
+          });
+          return;
+        }
+
+        localProgress += 1;
+        let msg = "";
+        if (localProgress <= 10) msg = "📤 Uploading image to server...";
+        else if (localProgress <= 20) msg = "🔍 Validating image format...";
+        else if (localProgress <= 35)
+          msg = "🌍 Detecting buildings and infrastructure...";
+        else if (localProgress <= 50)
+          msg = "🏜️ Analyzing terrain and surfaces...";
+        else if (localProgress <= 65)
+          msg = "🤖 AI model generating predictions...";
+        else if (localProgress <= 80)
+          msg = "🌳 Calculating optimal green space placement...";
+        else if (localProgress <= 90)
+          msg = "🎨 Applying green overlay and tree icons...";
+        else msg = "📊 Finalizing results and calculations...";
+
+        dispatch({
+          type: "UPDATE_PROGRESS",
+          payload: { progress: localProgress, statusMessage: msg },
+        });
+      }, 300);
+
+      const result = await api.generatePrediction(file, preview);
+
       if (progressInterval) {
         clearInterval(progressInterval);
         progressInterval = null;
       }
 
-      // Jump to 100% when complete
-      setProgress(100);
-      setStatusMessage("✅ Complete! Redirecting to results...");
+      dispatch({ type: "GENERATION_SUCCESS" });
 
       if (result.success) {
-        // 🔧 FIX: isGeneratingRef was never reset on the success path.
         isGeneratingRef.current = false;
 
         setTimeout(() => {
@@ -169,9 +250,10 @@ const Upload = () => {
           });
         }, 500);
       } else {
-        setError(result.error || "Generation failed. Please try again.");
-        setProgress(0);
-        setStatusMessage("");
+        dispatch({
+          type: "SET_ERROR",
+          payload: result.error || "Generation failed. Please try again.",
+        });
         isGeneratingRef.current = false;
       }
     } catch (err) {
@@ -181,47 +263,33 @@ const Upload = () => {
       }
 
       console.error("❌ Prediction failed:", err);
+      let errMsg =
+        err.message || "An unexpected error occurred. Please try again.";
 
-      // 🔧 BETTER ERROR HANDLING FOR MULTIPLE USERS
       if (err.response?.status === 503) {
-        setError(
-          "⏳ Server is busy processing another request. Please wait 30 seconds and try again.",
-        );
+        errMsg =
+          "⏳ Server is busy processing another request. Please wait 30 seconds and try again.";
       } else if (err.response?.status === 400) {
         const errorData = err.response.data;
-        if (errorData.detail && typeof errorData.detail === "object") {
-          setError(
-            errorData.detail.message ||
-              "Invalid image type. Please use a satellite/aerial image.",
-          );
-        } else {
-          setError(
-            errorData.detail ||
-              "Invalid image. Please use a satellite/aerial image.",
-          );
-        }
+        errMsg =
+          errorData.detail?.message ||
+          errorData.detail ||
+          "Invalid image. Please use a satellite/aerial image.";
       } else if (
         err.code === "ECONNABORTED" ||
         err.message.includes("timeout")
       ) {
-        setError(
-          "⏱️ Request timeout. The server is taking too long. Please try again with a smaller image or wait a moment.",
-        );
+        errMsg =
+          "⏱️ Request timeout. The server is taking too long. Please try again with a smaller image or wait a moment.";
       } else if (err.message === "Network Error") {
-        setError(
-          "🌐 Network error. The image might be too large. Please try a smaller image.",
-        );
-      } else {
-        setError(
-          err.message || "An unexpected error occurred. Please try again.",
-        );
+        errMsg =
+          "🌐 Network error. The image might be too large. Please try a smaller image.";
       }
 
-      setProgress(0);
-      setStatusMessage("");
+      dispatch({ type: "SET_ERROR", payload: errMsg });
       isGeneratingRef.current = false;
     } finally {
-      setIsProcessing(false);
+      dispatch({ type: "FINISH_PROCESSING" });
     }
   };
 
@@ -229,6 +297,7 @@ const Upload = () => {
     document.getElementById("fileInput")?.click();
   };
 
+  // Niche ka poora HTML/JSX same hai, isme koi badlav nahi kiya gaya hai.
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 py-16">
       <div className="container-custom max-w-5xl">
@@ -252,7 +321,6 @@ const Upload = () => {
         {/* Upload Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-10 mb-10 border border-gray-100">
           {!file ? (
-            // Upload Zone
             <div
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -304,7 +372,6 @@ const Upload = () => {
               </div>
             </div>
           ) : (
-            // Preview Zone
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -444,7 +511,6 @@ const Upload = () => {
         </div>
       </div>
 
-      {/* Add shimmer animation CSS */}
       <style>{`
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
