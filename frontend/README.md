@@ -58,7 +58,7 @@ frontend/
 │   │   └── storage.js      # (Legacy - deprecated)
 │   ├── App.jsx
 │   ├── main.jsx
-│   ├── App.css
+│
 │   └── index.css
 ├── .env.local              # Dev config (git ignored)
 ├── .env.example            # Template

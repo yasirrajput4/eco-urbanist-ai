@@ -172,24 +172,14 @@ const Upload = () => {
 
     try {
       progressInterval = setInterval(() => {
-        // Reducer synchronous hota hai, isliye interval ke andar current progress calculate karke bhejni hogi
         let currentProgress = 0;
 
-        // Interval ke andar hum trigger de rahe hain aur state update dispatch kar rahe hain
         dispatch({
           type: "UPDATE_PROGRESS",
           payload: () => {
-            // Hum is pattern ko safe rakhne ke liye functional logic reducer ke bahar ya state value se chalate hain
-            // Par smoothly manage karne ke liye, local variables ko direct read/increment karenge state object se:
             const prev = state.progress;
-
-            // Re-calculating next step safely based on reducer's latest active state reference
           },
         });
-
-        // Loop workaround ke bina, functional wrapper useReducer progress logic:
-        // Kyunki setInterval closure bana leta hai, reducer state.progress ki updated value nahi read kar paayega sahi se agar state variable reference loose ho jaye.
-        // Isliye logic ko clean rakhne ke liye hum direct state updates dispatch karte hain:
       }, 300);
 
       // 💡 Interval progress tracking block fixed to work seamlessly with useReducer state transitions:
@@ -297,7 +287,6 @@ const Upload = () => {
     document.getElementById("fileInput")?.click();
   };
 
-  // Niche ka poora HTML/JSX same hai, isme koi badlav nahi kiya gaya hai.
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 py-16">
       <div className="container-custom max-w-5xl">

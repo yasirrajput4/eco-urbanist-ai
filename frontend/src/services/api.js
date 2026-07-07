@@ -1,18 +1,5 @@
-/**
- * API Service for Eco-Urbanist AI
- *
- * CHANGED: Now points to Express backend (Node.js) instead of
- * FastAPI directly. Express handles auth, rate limiting, and gallery
- * storage, then proxies the image to FastAPI internally.
- *
- * OLD: React → FastAPI (port 8000)
- * NEW: React → Express (port 3000) → FastAPI (port 8000)
- */
-
 import axios from "axios";
 
-// CHANGED: was VITE_API_URL pointing to FastAPI (8000)
-// Now points to Express backend (3000)
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
   (typeof window !== "undefined" && window.location.hostname === "localhost"
@@ -21,7 +8,6 @@ const API_BASE_URL =
       ? window.location.origin
       : "");
 
-// 🔮 FIXED: Versioned storage keys to prevent future data-shape migration crashes
 const TOKEN_KEY = "eco_token:v1";
 const USER_KEY = "eco_user:v1";
 

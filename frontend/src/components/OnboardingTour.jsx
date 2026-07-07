@@ -1,10 +1,6 @@
 import { useState } from "react";
 import Joyride, { STATUS } from "react-joyride";
 
-// 🔧 FIX (Static value rebuilt every render): `steps` doesn't depend on any
-// component state/props, so it's moved to module scope. It's now built once
-// per module load instead of once per render, which also keeps referential
-// equality stable for any memoized children.
 const steps = [
   {
     target: "body",
@@ -118,26 +114,6 @@ const steps = [
   },
 ];
 
-// 🔧 FIX (Event logic handled in an effect): the previous version used a
-// useEffect that watched the `run` prop and called navigate("/upload")
-// whenever it flipped to true — that's the "faking an event handler with a
-// prop + useEffect" anti-pattern the linter flags (extra render, runs late,
-// and is easy to accidentally re-trigger on unrelated dependency changes).
-//
-// The redirect to "/upload" is really part of *starting the tour*, so it
-// belongs in the click handler that starts the tour, not in an effect that
-// reacts to state after the fact. Since that click handler lives in the
-// parent (wherever `run` gets set to true), OnboardingTour exposes a small
-// `startTour` helper the parent can call directly from its own onClick:
-//
-//   import { startTour } from "./OnboardingTour";
-//   <button onClick={() => startTour(navigate, () => setRun(true))}>
-//     Start Tour
-//   </button>
-//
-// This removes the effect entirely — navigation now happens synchronously
-// inside the event handler that triggers it, exactly once, with no need for
-// a ref-based "have we already redirected" guard.
 export const startTour = (navigate, setRun) => {
   navigate("/upload");
   setRun(true);

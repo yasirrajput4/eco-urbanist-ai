@@ -1,15 +1,3 @@
-/**
- * ProtectedRoute.jsx
- * Place at: frontend/src/components/ProtectedRoute.jsx
- *
- * Wraps any route that needs login.
- * Shows spinner while auth is loading (avoids flash-of-redirect on refresh).
- * Saves the attempted path so Login can redirect back after success.
- *
- * Usage in App.jsx:
- *   <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />
- */
-
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 

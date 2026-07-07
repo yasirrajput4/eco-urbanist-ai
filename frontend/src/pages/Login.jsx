@@ -1,8 +1,3 @@
-/**
- * Login.jsx
- * Place at: frontend/src/pages/Login.jsx
- */
-
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Leaf, Mail, Lock, Eye, EyeOff, Sparkles } from "lucide-react";

@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react"; // 🔧 Fixed: Added useRef
 import { Download, X, Smartphone, Zap, Wifi } from "lucide-react";
 
 const InstallPWA = () => {
-  // 🔧 Fixed: Used useRef instead of useState for deferredPrompt to prevent extra re-renders
   const deferredPromptRef = useRef(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
@@ -22,7 +21,7 @@ const InstallPWA = () => {
     // Listen for install prompt
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
-      deferredPromptRef.current = e; // 🔧 Fixed: Assigned to ref instead of state
+      deferredPromptRef.current = e;
 
       // Show custom prompt after 3 seconds
       timerId = setTimeout(() => {
@@ -42,7 +41,6 @@ const InstallPWA = () => {
   }, []);
 
   const handleInstall = async () => {
-    // 🔧 Fixed: Reading from ref.current
     if (!deferredPromptRef.current) {
       return;
     }
@@ -54,7 +52,7 @@ const InstallPWA = () => {
       console.log("PWA installed");
     }
 
-    deferredPromptRef.current = null; // 🔧 Fixed: Clear ref
+    deferredPromptRef.current = null;
     setShowInstallPrompt(false);
   };
 
@@ -71,7 +69,6 @@ const InstallPWA = () => {
     <div className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 md:w-96 z-50 animate-slideUp">
       <div className="bg-white rounded-2xl shadow-2xl border-2 border-green-500 p-6 relative">
         {/* Close Button */}
-        {/* 🔧 Fixed: Added type="button" and aria-label for better accessibility */}
         <button
           type="button"
           onClick={handleDismiss}
@@ -112,7 +109,6 @@ const InstallPWA = () => {
 
         {/* Buttons */}
         <div className="grid grid-cols-2 gap-3">
-          {/* 🔧 Fixed: Added type="button" */}
           <button
             type="button"
             onClick={handleDismiss}
@@ -120,7 +116,6 @@ const InstallPWA = () => {
           >
             Maybe Later
           </button>
-          {/* 🔧 Fixed: Added type="button" */}
           <button
             type="button"
             onClick={handleInstall}

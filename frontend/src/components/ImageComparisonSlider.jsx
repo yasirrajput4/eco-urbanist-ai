@@ -57,7 +57,6 @@ const ImageComparisonSlider = ({
       passive: true,
     });
 
-    // 🔧 FIXED: Added { passive: true } to eliminate touch scrolling jank and clear the linter warning
     window.addEventListener("touchend", handleGlobalTouchEnd, {
       passive: true,
     });

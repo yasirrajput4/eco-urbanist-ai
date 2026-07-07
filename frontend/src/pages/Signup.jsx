@@ -1,8 +1,3 @@
-/**
- * Signup.jsx
- * Place at: frontend/src/pages/Signup.jsx
- */
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Leaf, User, Mail, Lock, Eye, EyeOff, Sparkles } from "lucide-react";

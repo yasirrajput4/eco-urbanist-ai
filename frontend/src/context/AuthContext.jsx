@@ -1,11 +1,3 @@
-/**
- * AuthContext.jsx
- * Place at: frontend/src/context/AuthContext.jsx
- *
- * Global auth state — login, signup, logout, currentUser.
- * Wrap App with <AuthProvider> so every component can call useAuth().
- */
-
 import {
   createContext,
   useContext,
