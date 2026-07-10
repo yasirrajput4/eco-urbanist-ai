@@ -77,13 +77,10 @@ router.post(
         metadata: result.metadata || {},
       });
 
-      // ── 6. 🔧 FIXED: Generate valid absolute URLs for React Slider ───
-      // Express host context find karne ke liye request fallback framework construct kiya hai
       const protocol = req.protocol;
       const host = req.get("host");
       const expressBaseUrl = `${protocol}://${host}`;
 
-      // Input (Before) Image fallback target: Agar aap thumbnail use kar rahe hain toh backup dynamic data string bhej sakte hain
       const sliderInputImage = req.body.inputImagePreview || null;
 
       // Output (After) Image fallback target: Dynamic streaming URL creation
@@ -94,7 +91,6 @@ router.post(
         galleryId: galleryEntry._id,
         predictionsToday: req.user.predictionsToday,
         dailyLimit: parseInt(process.env.PREDICTIONS_PER_DAY || "5"),
-        // 🔧 In dono keys ko directly react client slider ke paths se connect karein
         inputImage: sliderInputImage,
         outputImage: sliderOutputImage,
       });

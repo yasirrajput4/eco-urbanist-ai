@@ -15,7 +15,7 @@ import {
 import api from "../services/api";
 import { validateImageFile, fileToDataUrl } from "../utils/helpers";
 
-// 1. Initial State define kari
+// 1. Initial State define
 const initialState = {
   file: null,
   preview: null,
@@ -26,7 +26,7 @@ const initialState = {
   statusMessage: "",
 };
 
-// 2. Reducer function banaya jo state transitions ko track karega
+// 2. Reducer function is builded for state transitions track
 function uploadReducer(state, action) {
   switch (action.type) {
     case "SET_DRAG":
@@ -49,7 +49,7 @@ function uploadReducer(state, action) {
         statusMessage: "",
       };
     case "REMOVE_FILE":
-      return { ...initialState }; // Poori state reset
+      return { ...initialState }; // All states are reset
     case "START_GENERATION":
       return {
         ...state,
@@ -80,10 +80,9 @@ function uploadReducer(state, action) {
 const Upload = () => {
   const navigate = useNavigate();
 
-  // 3. useReducer hook ka setup
+  // 3. useReducer hook setup
   const [state, dispatch] = useReducer(uploadReducer, initialState);
 
-  // Destructure kar liya taaki aapka niche ka JSX bilkul na badalna pade
   const {
     file,
     preview,

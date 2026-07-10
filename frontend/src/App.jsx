@@ -39,7 +39,7 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="flex flex-col min-h-screen relative overflow-hidden">
-          {/* LEAVES OVERLAY (Ab saara inline style gayab) */}
+          {/* LEAVES OVERLAY */}
           <div className="leaves-overlay pointer-events-none">
             {/* LEFT SIDE LEAVES */}
             <div className="leaf-item left-[2%] top-[-10%] text-[2rem] animate-float-leaf">

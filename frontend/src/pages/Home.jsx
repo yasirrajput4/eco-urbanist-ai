@@ -17,7 +17,7 @@ const Home = () => {
   const sectionRefs = useRef([]);
 
   useEffect(() => {
-    // Current refs ko ek local variable me store kiya clean-up ke liye
+    // Current refs is store in the local variable for clean-up
     const currentRefs = sectionRefs.current;
 
     const observers = currentRefs.map((ref, index) => {
@@ -34,7 +34,7 @@ const Home = () => {
       return observer;
     });
 
-    // Cleanup function ko correct structure me likha
+    // Cleanup function is written in the correct structure
     return () => {
       observers.forEach((observer, index) => {
         if (currentRefs[index]) {
