@@ -2,7 +2,8 @@
  * LocalStorage utility for gallery management
  */
 
-const GALLERY_KEY = "eco-urbanist-gallery";
+// Added :v1 to prevent data structure conflicts in the future
+const GALLERY_KEY = "eco-urbanist-gallery:v1";
 
 export const galleryStorage = {
   /**
@@ -14,10 +15,14 @@ export const galleryStorage = {
       return data ? JSON.parse(data) : [];
     } catch (error) {
       console.error("Error reading gallery:", error);
+      // Return empty array to recover from corrupt data
       return [];
     }
   },
 
+  /**
+   * Add a new item to the gallery
+   */
   add: (item) => {
     try {
       const gallery = galleryStorage.getAll();
@@ -38,10 +43,9 @@ export const galleryStorage = {
         ) {
           let trimmed = [...gallery];
 
-          // Try progressively removing the oldest items (largest images
-          // tend to accumulate over time) until it fits, or nothing is left.
+          // Try progressively removing the oldest items until it fits
           while (trimmed.length > 1) {
-            trimmed = trimmed.slice(0, -1); // drop oldest
+            trimmed = trimmed.slice(0, -1);
             try {
               localStorage.setItem(GALLERY_KEY, JSON.stringify(trimmed));
               console.warn(
